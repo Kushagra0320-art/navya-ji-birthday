@@ -1,529 +1,304 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>ke
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday, Meri Pasandida Aurat Ji!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To My Forever Love 💍 Will You Say Yes Again?</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap"/>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #ffe6f0, #fff5f8);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
+      color: #333;
       min-height: 100vh;
-      color: #4a1a2c;
       position: relative;
+      overflow-x: hidden;
     }
-    .container {
-      max-width: 900px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    h1, h2 { font-family: 'Great Vibes', cursive; color: #c2185b; text-align: center; margin: 20px 0; }
+    section { padding: 50px 15px; max-width: 1000px; margin: auto; }
+    .hearts { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+    .heart {
+      position: absolute; font-size: 24px; animation: float 10s linear infinite;
+      opacity: 0.8; user-select: none;
     }
-    .container::before {
-      content: '🌸';
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      font-size: 60px;
-      opacity: 0.3;
+    @keyframes float {
+      0% { transform: translateY(110vh) rotate(0deg); }
+      100% { transform: translateY(-20vh) rotate(1080deg); }
     }
-    .container::after {
-      content: '🦄';
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      font-size: 60px;
-      opacity: 0.3;
+    .intro { text-align: center; padding-top: 60px; }
+    .games { background: rgba(255,255,255,0.4); border-radius: 20px; padding: 30px; margin: 30px auto; }
+    .game { margin: 40px 0; border: 1px solid #ffb3c6; border-radius: 16px; padding: 20px; background: white; }
+    .game h3 { color: #d81b60; margin-bottom: 15px; }
+    #tic-board { display: grid; grid-template-columns: repeat(3, 80px); gap: 8px; justify-content: center; margin: 20px auto; }
+    .tic-cell { width: 80px; height: 80px; background: #fff0f5; border: 2px solid #ff80ab; font-size: 3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .tic-cell:hover { background: #ffe4e1; }
+    #rps-buttons { text-align: center; margin: 20px 0; }
+    .rps-btn { font-size: 4rem; margin: 0 20px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
+    .rps-btn:hover { transform: scale(1.3); }
+    #memory-grid { display: grid; grid-template-columns: repeat(4, 70px); gap: 10px; justify-content: center; margin: 20px auto; }
+    .memory-card { width: 70px; height: 90px; perspective: 1000px; cursor: pointer; }
+    .memory-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+    .memory-card.flipped .memory-inner { transform: rotateY(180deg); }
+    .memory-front, .memory-back {
+      position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; border-radius: 12px; background: #ff80ab; color: white;
     }
-    h1 {
-      color: #d81b60;
-      font-size: 40px;
-      font-family: 'Georgia', serif;
-      margin-bottom: 25px;
-      text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    .memory-back { background: #ffb3c6; transform: rotateY(180deg); }
+    .quiz-question { margin: 25px 0; font-size: 1.2rem; }
+    .quiz-options button { display: block; margin: 10px auto; padding: 12px 30px; font-size: 1.1rem; cursor: pointer; }
+    #snake-board { width: 300px; height: 300px; background: #fff0f5; margin: 20px auto; position: relative; border: 2px solid #ff4081; overflow: hidden; }
+    .snake-part { position: absolute; width: 20px; height: 20px; background: #d81b60; border-radius: 4px; }
+    .food { position: absolute; width: 20px; height: 20px; background: #ffeb3b; border-radius: 50%; }
+    .proposal { background: rgba(255,255,255,0.85); border-radius: 24px; padding: 50px 30px; text-align: center; box-shadow: 0 10px 40px rgba(216,27,96,0.3); }
+    .letter { font-size: 1.25rem; line-height: 1.8; max-width: 720px; margin: 30px auto; }
+    .yes-btn {
+      margin-top: 40px; padding: 18px 70px; font-size: 2.4rem; font-weight: bold;
+      background: #ff4081; color: white; border: none; border-radius: 60px; cursor: pointer;
+      box-shadow: 0 8px 30px rgba(255,64,129,0.5); transition: all 0.3s;
     }
-    p {
-      font-size: 20px;
-      line-height: 1.6;
-    }
-    input, button {
-      padding: 15px;
-      margin: 15px;
-      font-size: 20px;
-      border-radius: 10px;
-    }
-    input {
-      border: 2px solid #f06292;
-      width: 80%;
-      max-width: 450px;
-    }
-    button {
-      background: #d81b60;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #ad1457;
-    }
-    .section {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    .section.active {
-      display: block;
-      opacity: 1;
-    }
-    #wish {
-      position: relative;
-      background-image: url('https://images.unsplash.com/photo-1602632000188-9b12d8d6bc7d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
-      background-size: cover;
-      background-position: center;
-      border-radius: 20px;
-      padding: 40px;
-      color: #fff;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-      overflow-y: auto;
-      max-height: 100vh;
-      padding-bottom: 20px;
-    }
-    #wish::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 0;
-    }
-    #wish h1, #wish p, #wish button {
-      position: relative;
-      z-index: 1;
-    }
-    .fireworks {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9999;
-    }
-    .firework {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      animation: firework 1.2s ease-out infinite;
-      opacity: 0;
-    }
-    .firework:nth-child(1) { background: #ff4081; animation-delay: 0s; --x: 20vw; --y: -30vh; left: 10%; top: 20%; }
-    .firework:nth-child(2) { background: #4caf50; animation-delay: 0.2s; --x: -25vw; --y: -25vh; left: 30%; top: 30%; }
-    .firework:nth-child(3) { background: #ffeb3b; animation-delay: 0.4s; --x: 30vw; --y: 20vh; left: 50%; top: 40%; }
-    .firework:nth-child(4) { background: #3f51b5; animation-delay: 0.6s; --x: -20vw; --y: 25vh; left: 70%; top: 50%; }
-    .firework:nth-child(5) { background: #e91e63; animation-delay: 0.8s; --x: 25vw; --y: -20vh; left: 20%; top: 60%; }
-    .firework:nth-child(6) { background: #2196f3; animation-delay: 1s; --x: -30vw; --y: 30vh; left: 40%; top: 70%; }
-    .firework:nth-child(7) { background: #ff9800; animation-delay: 0.2s; --x: 15vw; --y: -25vh; left: 60%; top: 20%; }
-    .firework:nth-child(8) { background: #9c27b0; animation-delay: 0.4s; --x: -15vw; --y: 20vh; left: 80%; top: 30%; }
-    .firework:nth-child(9) { background: #00bcd4; animation-delay: 0.6s; --x: 20vw; --y: -30vh; left: 15%; top: 40%; }
-    .firework:nth-child(10) { background: #f44336; animation-delay: 0.8s; --x: -25vw; --y: 25vh; left: 35%; top: 50%; }
-    .firework:nth-child(11) { background: #8bc34a; animation-delay: 1s; --x: 30vw; --y: -20vh; left: 55%; top: 60%; }
-    .firework:nth-child(12) { background: #ffc107; animation-delay: 0.2s; --x: -20vw; --y: 30vh; left: 75%; top: 70%; }
-    @keyframes firework {
-      0% { transform: translate(0, 0); opacity: 1; }
-      100% { transform: translate(var(--x), var(--y)); opacity: 0; }
-    }
-    .game-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 80px);
-      gap: 12px;
-      margin: 25px auto;
-      justify-content: center;
-    }
-    .game-card {
-      width: 80px;
-      height: 80px;
-      background: #f06292;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: transform 0.3s;
-      user-select: none;
-      touch-action: manipulation;
-    }
-    .game-card.revealed {
-      background: #fff;
-      transform: scale(1.1);
-    }
-    .game-card.matched {
-      background: #fce4ec;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    li {
-      margin: 15px 0;
-      font-size: 20px;
-      background: #fff3f5;
-      padding: 12px;
-      border-radius: 8px;
-    }
-    .reason-letter {
-      text-decoration: underline;
-    }
-    .feedback {
-      font-size: 18px;
-    }
-    .feedback.correct {
-      color: #2e7d32;
-    }
-    .feedback.error {
-      color: #b71c1c;
-    }
-    @media (max-width: 600px) {
-      .container {
-        padding: 25px;
-      }
-      h1 {
-        font-size: 32px;
-      }
-      p, li {
-        font-size: 18px;
-      }
-      #wish {
-        padding: 20px;
-      }
-      #wish p {
-        font-size: 18px;
-      }
-      input, button {
-        width: 90%;
-        font-size: 18px;
-      }
-      .game-grid {
-        grid-template-columns: repeat(4, 65px);
-      }
-      .game-card {
-        width: 65px;
-        height: 65px;
-        font-size: 32px;
-      }
-    }
-    @media (max-width: 400px) {
-      .container {
-        padding: 15px;
-      }
-      #wish {
-        padding: 15px;
-      }
-      #wish p {
-        font-size: 16px;
-      }
-      h1 {
-        font-size: 28px;
-      }
-      p, li {
-        font-size: 16px;
-      }
-      input, button {
-        font-size: 16px;
-      }
-      .game-grid {
-        grid-template-columns: repeat(3, 60px);
-      }
-      .game-card {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-      }
-    }
+    .yes-btn:hover { transform: scale(1.12); background: #f50057; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="riddles" class="section active">
-      <h1>Happy Birthday, Meri Pasandida Aurat Ji!</h1>
-      <p id="riddle-text">Riddle 1: I’m sweet and round, with candles that glow, the older you get, the more I grow. What am I?</p>
-      <input type="text" id="riddle-answer" placeholder="Type your answer">
-      <button onclick="checkRiddle()">Submit Answer</button>
-      <p id="riddle-feedback" class="feedback"></p>
+
+<div class="hearts" id="hearts"></div>
+
+<section class="intro">
+  <h1>Hey My Love 💕</h1>
+  <p style="font-size:1.5rem; margin:25px 0;">I fall for you more every day… so I want to ask again…</p>
+  <h2 style="font-size:3.8rem;">Will you be mine forever? ✨💍</h2>
+</section>
+
+<section class="games">
+  <h2 style="font-size:2.6rem;">🎮 Play These Games… Then Read My Letter</h2>
+
+  <!-- 1. Tic Tac Toe -->
+  <div class="game">
+    <h3>1. Tic Tac Toe (You = ❤️  Me = ⭐)</h3>
+    <div id="tic-board"></div>
+    <p id="tic-status" style="text-align:center; font-size:1.3rem; margin-top:15px;">Your turn ❤️</p>
+  </div>
+
+  <!-- 2. Rock Paper Scissors -->
+  <div class="game">
+    <h3>2. Rock Paper Scissors</h3>
+    <div id="rps-buttons">
+      <button class="rps-btn" onclick="rpsPlay('🪨')">🪨</button>
+      <button class="rps-btn" onclick="rpsPlay('📄')">📄</button>
+      <button class="rps-btn" onclick="rpsPlay('✂️')">✂️</button>
     </div>
-    <div id="reasons" class="section">
-      <h1>A se Z: Why I Love You</h1>
-      <ul id="reasons-list"></ul>
-      <button id="next-reason" onclick="showNextReason()">Next</button>
-    </div>
-    <div id="game" class="section">
-      <h1>Birthday Love Memory Game</h1>
-      <p>Do same emojis ko match karo aur jeeto!</p>
-      <p id="game-progress" class="feedback">Pairs Matched: 0/12</p>
-      <div class="game-grid" id="game-grid"></div>
-      <p id="game-feedback" class="feedback"></p>
-      <button id="wish-button" style="display: none;" onclick="showSection('reasons'); showReason()">Apki Birthday Wish Dekho</button>
-    </div>
-    <div id="wish" class="section">
-      <h1>My Heartfelt Birthday Wish</h1>
-      <p style="font-style: italic;">Happy Birthday Navya ji, Happy Happy Birthday, aaj sabse special din hai, yaar its ook ki aap ese gayi mujhe chodh ke aapki sitiuation esi thi koi baat nahi mai dukhi isliye hota hun kyon ki aap khud ko dosh deti ho, maat do khud ko dosh aapki koi galti nahi hai its okay, chalo chodo ye baat aaj aapka birthday hai yeeeeeeeeeeee!!!!! My wishes are always with you aap khub padh likh ke aage badho aapne papa mummy ka naam roshan karo khud ka naam roshan karo, or hamesha khush raho yaar aap meri hamesha 1st and last wish rahogi, i know apn ko dur hue time hogaya hai but aapki yaad bohot aati h kabhi kabhi tto bhai sahb itni ki bas dikh hi jao lekin koi baat nahi ye aapka decision tha and i respect it koi baat nahi, and bas aap jo chati ho woi ho bas i want this aap yaar aache se padhai karo doctor bano and kabhi bhi low feel ho ya maan na kare be jhijak baat karne aajana i will here for you, and take care of your self physically, mentally, emotionally and one more time Happy Birthday princess</p>
-      <button onclick="replay()">Replay</button>
+    <p id="rps-result" style="text-align:center; font-size:1.4rem;"></p>
+  </div>
+
+  <!-- 3. Memory Game -->
+  <div class="game">
+    <h3>3. Memory – Match the Hearts</h3>
+    <div id="memory-grid"></div>
+    <p id="memory-status" style="text-align:center; font-size:1.3rem; margin-top:15px;">Pairs found: 0 / 6</p>
+  </div>
+
+  <!-- 4. Love Quiz -->
+  <div class="game">
+    <h3>4. Our Love Quiz</h3>
+    <div id="quiz-container">
+      <div class="quiz-question" id="quiz-question"></div>
+      <div id="quiz-options"></div>
+      <p id="quiz-feedback" style="font-size:1.3rem; margin:15px 0; text-align:center;"></p>
     </div>
   </div>
-  <div id="fireworks" class="fireworks" style="display: none;">
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
-    <div class="firework"></div>
+
+  <!-- 5. Snake -->
+  <div class="game">
+    <h3>5. Snake – Collect Hearts!</h3>
+    <div id="snake-board"></div>
+    <p style="text-align:center; font-size:1.3rem; margin-top:15px;">Use arrow keys • Score: <span id="snake-score">0</span></p>
   </div>
-  <script>
-    const riddles = [
-      { question: "I’m sweet and round, with candles that glow, the older you get, the more I grow. What am I?", answer: "cake" },
-      { question: "I’m wrapped with a bow, holding surprises inside. Open me to find joy on your special day. What am I?", answer: "gift" },
-      { question: "I come once a year, bringing joy and cheer. You count the days until I’m here. What am I?", answer: "birthday" }
-    ];
-    const reasons = [
-      "<span class='reason-letter'>A</span>: Apki adorable smile jo dil chura leti hai.",
-      "<span class='reason-letter'>B</span>: Bahadur dil jo har challenge ko face karta hai.",
-      "<span class='reason-letter'>C</span>: Caring nature jo sabko pyar deta hai.",
-      "<span class='reason-letter'>D</span>: Dreamy aankhein jisme main kho jata hoon.",
-      "<span class='reason-letter'>E</span>: Endless kindness jo mujhe inspire karti hai.",
-      "<span class='reason-letter'>F</span>: Fun-loving spirit jo har pal ko mazedar banati hai.",
-      "<span class='reason-letter'>G</span>: Genuine rooh jo hamesha sachchi hai.",
-      "<span class='reason-letter'>H</span>: Heartwarming hasi jo meri duniya roshan karti hai.",
-      "<span class='reason-letter'>I</span>: Inspiring strength jo mujhe better banati hai.",
-      "<span class='reason-letter'>J</span>: Jovial energy jo har jagah chamak deti hai.",
-      "<span class='reason-letter'>K</span>: Kind gestures jo mera din banate hain.",
-      "<span class='reason-letter'>L</span>: Loving jhappi jo ghar jaisa feel deti hai.",
-      "<span class='reason-letter'>M</span>: Magical presence jo zindagi ko khaas banati hai.",
-      "<span class='reason-letter'>N</span>: Nurturing pyar jo hamesha sukoon deta hai.",
-      "<span class='reason-letter'>O</span>: Optimistic nazariya jo mera mood uplift karta hai.",
-      "<span class='reason-letter'>P</span>: Passionate dil jo pura josh se pyar karta hai.",
-      "<span class='reason-letter'>Q</span>: Quirky charm jo sirf aap mein hai.",
-      "<span class='reason-letter'>R</span>: Radiant sundarta, andar aur bahar dono.",
-      "<span class='reason-letter'>S</span>: Supportive baatein jo mujhe himmat deti hain.",
-      "<span class='reason-letter'>T</span>: Thoughtful kaam jo dikhate hain aap kitna khayal rakhti ho.",
-      "<span class='reason-letter'>U</span>: Unforgettable pal jo hum saath bitaye the.",
-      "<span class='reason-letter'>V</span>: Vibrant personality jo mujhe pasand hai.",
-      "<span class='reason-letter'>W</span>: Warmth jo har din ko behtar banati hai.",
-      "<span class='reason-letter'>X</span>: Xtraordinary pyar jo main hamesha cherish karta hoon.",
-      "<span class='reason-letter'>Y</span>: Youthful spirit jo aapko young rakhti hai.",
-      "<span class='reason-letter'>Z</span>: Zealous mohabbat jo mera dil dhadkati hai."
-    ];
-    let currentRiddle = 0;
-    let currentReason = 0;
-    let matchedPairs = 0;
-    let selectedCards = [];
-    let isGameLocked = false;
+</section>
 
-    const emojis = ['❤️', '❤️', '🌹', '🌹', '💖', '💖', '💝', '💝', '💞', '💞', 
-                    '💘', '💘', '💗', '💗', '🌸', '🌸', '🦄', '🦄', '💋', '💋', 
-                    '💌', '💌', '✨', '✨'];
-    let shuffledEmojis = [...emojis].sort(() => Math.random() - 0.5);
+<section class="proposal">
+  <h1>💌 My Re-Proposal Letter</h1>
+  <div class="letter">
+    <p>My dearest [Her Name],</p>
+    <p>Every laugh, every late-night talk, every small fight we fix… makes me love you even more than yesterday.</p>
+    <p>I still smile thinking about [put one memory here – example: our first long drive when we sang badly together]. Moments like that remind me you're my home.</p>
+    <p>So today I want to ask again — with my whole heart:</p>
+    <p style="font-size:1.9rem; margin:40px 0; color:#d81b60; font-weight:bold;">
+      Will you keep saying yes to us… every single day… forever? 💍❤️
+    </p>
+  </div>
+  <button class="yes-btn" onclick="sayYes()">YES, FOREVER! 💕</button>
+</section>
 
-    function showSection(sectionId) {
-      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
-      document.getElementById('fireworks').style.display = sectionId === 'wish' ? 'block' : 'none';
-    }
+<script>
+// Floating hearts
+const heartsDiv = document.getElementById('hearts');
+const heartEmojis = ['❤️','💖','💗','💓','💞','💘','💝'];
+function spawnHeart() {
+  const h = document.createElement('div');
+  h.className = 'heart';
+  h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+  h.style.left = Math.random()*100 + 'vw';
+  h.style.animationDuration = (Math.random()*6 + 8) + 's';
+  h.style.fontSize = (Math.random()*18 + 16) + 'px';
+  heartsDiv.appendChild(h);
+  setTimeout(() => h.remove(), 14000);
+}
+setInterval(spawnHeart, 350);
 
-    function checkRiddle() {
-      const answer = document.getElementById('riddle-answer').value.trim().toLowerCase();
-      const feedback = document.getElementById('riddle-feedback');
-      if (!answer) {
-        feedback.textContent = 'Please enter an answer!';
-        feedback.className = 'feedback error';
-        return;
-      }
-      if (answer === riddles[currentRiddle].answer) {
-        currentRiddle++;
-        if (currentRiddle < riddles.length) {
-          document.getElementById('riddle-text').textContent = riddles[currentRiddle].question;
-          document.getElementById('riddle-answer').value = '';
-          feedback.textContent = 'Correct! Next riddle.';
-          feedback.className = 'feedback correct';
-        } else {
-          feedback.textContent = 'All riddles solved! Play the memory game.';
-          feedback.className = 'feedback correct';
-          showSection('game');
-        }
+// Tic Tac Toe
+const ticBoard = document.getElementById('tic-board');
+const ticStatus = document.getElementById('tic-status');
+let ticCells = [], ticCurrent = '❤️', ticGameActive = true;
+for(let i=0; i<9; i++){
+  const cell = document.createElement('div');
+  cell.className = 'tic-cell';
+  cell.onclick = () => ticClick(i);
+  ticBoard.appendChild(cell);
+  ticCells.push('');
+}
+function ticClick(idx){
+  if(!ticGameActive || ticCells[idx]) return;
+  ticCells[idx] = ticCurrent;
+  ticBoard.children[idx].textContent = ticCurrent;
+  if(ticCheckWin()) {
+    ticStatus.textContent = ticCurrent + ' wins! 🎉';
+    ticGameActive = false;
+    return;
+  }
+  if(ticCells.every(c=>c)) {
+    ticStatus.textContent = "It's a tie!";
+    ticGameActive = false;
+    return;
+  }
+  ticCurrent = ticCurrent==='❤️' ? '⭐' : '❤️';
+  ticStatus.textContent = ticCurrent + "'s turn";
+}
+function ticCheckWin(){
+  const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return wins.some(combo => combo.every(i => ticCells[i]===ticCurrent));
+}
+
+// Rock Paper Scissors
+function rpsPlay(player){
+  const choices = ['🪨','📄','✂️'];
+  const comp = choices[Math.floor(Math.random()*3)];
+  let msg = `You: ${player}  •  Me: ${comp}<br>`;
+  if(player === comp) msg += "Tie!";
+  else if(
+    (player==='🪨' && comp==='✂️') ||
+    (player==='📄' && comp==='🪨') ||
+    (player==='✂️' && comp==='📄')
+  ) msg += "You win this round! 😍";
+  else msg += "I win! Better luck next time 😉";
+  document.getElementById('rps-result').innerHTML = msg;
+}
+
+// Memory Game
+const memoryGrid = document.getElementById('memory-grid');
+const memoryStatus = document.getElementById('memory-status');
+let memoryCards = ['❤️','❤️','💖','💖','💗','💗','💓','💓','💞','💞','💘','💘'];
+memoryCards.sort(()=>Math.random()-0.5);
+let memoryFlipped = [], memoryFound = 0;
+memoryCards.forEach((val, i) => {
+  const card = document.createElement('div');
+  card.className = 'memory-card';
+  card.innerHTML = `<div class="memory-inner">
+    <div class="memory-front">${val}</div>
+    <div class="memory-back">?</div>
+  </div>`;
+  card.onclick = () => memoryFlip(card, val);
+  memoryGrid.appendChild(card);
+});
+function memoryFlip(card, val){
+  if(card.classList.contains('flipped') || memoryFlipped.length === 2) return;
+  card.classList.add('flipped');
+  memoryFlipped.push({card, val});
+  if(memoryFlipped.length === 2){
+    setTimeout(() => {
+      if(memoryFlipped[0].val === memoryFlipped[1].val){
+        memoryFound++;
+        memoryStatus.textContent = `Pairs found: ${memoryFound} / 6`;
+        if(memoryFound === 6) memoryStatus.textContent += " – You won my heart again! 💕";
       } else {
-        feedback.textContent = 'Wrong answer! Try again.';
-        feedback.className = 'feedback error';
+        memoryFlipped.forEach(c => c.card.classList.remove('flipped'));
       }
-    }
+      memoryFlipped = [];
+    }, 900);
+  }
+}
 
-    function showReason() {
-      const reasonsList = document.getElementById('reasons-list');
-      reasonsList.innerHTML = `<li>${reasons[currentReason]}</li>`;
-      const nextButton = document.getElementById('next-reason');
-      if (currentReason === reasons.length - 1) {
-        nextButton.textContent = 'See Your Birthday Wish';
-        nextButton.onclick = () => showSection('wish');
-      } else {
-        nextButton.textContent = 'Next';
-        nextButton.onclick = showNextReason;
-      }
-    }
+// Quiz
+const quizData = [
+  { q: "What was our first date food?", a: "Pizza", opts: ["Pizza","Burger","Pasta","Ice cream"] },
+  { q: "My favorite thing about you is your…", a: "Smile", opts: ["Smile","Eyes","Laugh","Hugs"] },
+  { q: "Our song is…", a: "Something romantic", opts: ["Something romantic","Party song","Sad song","No song"] },
+  { q: "I love you…", a: "More than anything", opts: ["More than anything","A lot","Little bit","Yesterday only"] },
+  { q: "Will you say yes again?", a: "Yes!", opts: ["Yes!","Maybe","No","Ask later"] }
+];
+let quizIdx = 0;
+function loadQuiz(){
+  const q = quizData[quizIdx];
+  document.getElementById('quiz-question').textContent = q.q;
+  const optsDiv = document.getElementById('quiz-options');
+  optsDiv.innerHTML = '';
+  q.opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.onclick = () => quizAnswer(opt);
+    optsDiv.appendChild(btn);
+  });
+}
+function quizAnswer(selected){
+  const correct = quizData[quizIdx].a;
+  const fb = document.getElementById('quiz-feedback');
+  fb.textContent = selected === correct ? "Correct! ❤️" : `Wrong… it was ${correct}`;
+  quizIdx++;
+  if(quizIdx < quizData.length) setTimeout(loadQuiz, 1400);
+  else fb.textContent += " Quiz done! Now read the letter below ↓";
+}
+loadQuiz();
 
-    function showNextReason() {
-      if (currentReason < reasons.length - 1) {
-        currentReason++;
-        showReason();
-      }
-    }
+// Snake (very basic)
+const snakeBoard = document.getElementById('snake-board');
+let snake = [{x:140, y:140}], dir = {x:20, y:0}, food, scoreEl = document.getElementById('snake-score'), score=0;
+function placeFood(){
+  food = {x: Math.floor(Math.random()*14)*20 + 20, y: Math.floor(Math.random()*14)*20 + 20};
+  let f = document.createElement('div');
+  f.className = 'food'; f.style.left = food.x+'px'; f.style.top = food.y+'px';
+  snakeBoard.appendChild(f);
+}
+placeFood();
+function snakeUpdate(){
+  let head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+  if(head.x<0||head.x>=300||head.y<0||head.y>=300||snake.some(s=>s.x===head.x&&s.y===head.y)){
+    alert("Game over! Score: " + score); location.reload(); return;
+  }
+  snake.unshift(head);
+  if(head.x===food.x && head.y===food.y){
+    score++; scoreEl.textContent = score; snakeBoard.lastChild.remove(); placeFood();
+  } else snake.pop();
+  snakeBoard.innerHTML = ''; snake.forEach(s=>{
+    let p = document.createElement('div'); p.className='snake-part';
+    p.style.left=s.x+'px'; p.style.top=s.y+'px'; snakeBoard.appendChild(p);
+  });
+  snakeBoard.appendChild(snakeBoard.lastChild); // keep food
+}
+setInterval(snakeUpdate, 180);
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowUp' && dir.y===0) dir={x:0,y:-20};
+  if(e.key==='ArrowDown' && dir.y===0) dir={x:0,y:20};
+  if(e.key==='ArrowLeft' && dir.x===0) dir={x:-20,y:0};
+  if(e.key==='ArrowRight' && dir.x===0) dir={x:20,y:0};
+});
 
-    function setupGame() {
-      const gameGrid = document.getElementById('game-grid');
-      gameGrid.innerHTML = ''; // Clear grid to prevent duplicates
-      shuffledEmojis = [...emojis].sort(() => Math.random() - 0.5); // Reshuffle
-      shuffledEmojis.forEach((emoji, index) => {
-        const card = document.createElement('div');
-        card.classList.add('game-card');
-        card.dataset.emoji = emoji;
-        card.textContent = '?';
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', 'Memory card, click to reveal');
-        card.setAttribute('tabindex', '0');
-        card.addEventListener('click', () => handleCardClick(card, index));
-        card.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          handleCardClick(card, index);
-        });
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleCardClick(card, index);
-          }
-        });
-        gameGrid.appendChild(card);
-      });
-      document.getElementById('game-progress').textContent = `Pairs Matched: ${matchedPairs}/12`;
-      // console.log('Game grid initialized with', shuffledEmojis.length, 'cards');
-    }
+// Yes button
+function sayYes(){
+  confetti({ particleCount: 300, spread: 100, origin: {y:0.6} });
+  setTimeout(()=>alert("She said YES!!! 🎉💍 I love you forever! ❤️"), 600);
+}
+</script>
 
-    function handleCardClick(card, index) {
-      if (isGameLocked || selectedCards.length >= 2 || card.classList.contains('revealed') || card.classList.contains('matched')) {
-        return;
-      }
-      isGameLocked = true;
-      card.classList.add('revealed');
-      card.textContent = card.dataset.emoji;
-      selectedCards.push({ card, index });
-      // console.log('Card clicked:', card.dataset.emoji, 'Selected cards:', selectedCards.length);
-
-      if (selectedCards.length === 2) {
-        const [first, second] = selectedCards;
-        if (first.card.dataset.emoji === second.card.dataset.emoji) {
-          first.card.classList.add('matched');
-          second.card.classList.add('matched');
-          matchedPairs++;
-          selectedCards = [];
-          document.getElementById('game-progress').textContent = `Pairs Matched: ${matchedPairs}/12`;
-          if (matchedPairs === emojis.length / 2) {
-            document.getElementById('game-feedback').textContent = 'Tumne saare pairs match kar liye! Ab wish dekho!';
-            document.getElementById('wish-button').style.display = 'block';
-            // console.log('All pairs matched!');
-          }
-          isGameLocked = false;
-        } else {
-          setTimeout(() => {
-            first.card.classList.remove('revealed');
-            second.card.classList.remove('revealed');
-            first.card.textContent = '?';
-            second.card.textContent = '?';
-            selectedCards = [];
-            isGameLocked = false;
-            // console.log('Non-matching cards reset');
-          }, 1000);
-        }
-      } else {
-        isGameLocked = false;
-      }
-    }
-
-    function replay() {
-      currentRiddle = 0;
-      currentReason = 0;
-      matchedPairs = 0;
-      selectedCards = [];
-      isGameLocked = false;
-      document.getElementById('riddle-text').textContent = riddles[0].question;
-      document.getElementById('riddle-answer').value = '';
-      document.getElementById('riddle-feedback').textContent = '';
-      document.getElementById('game-feedback').textContent = '';
-      document.getElementById('game-progress').textContent = 'Pairs Matched: 0/12';
-      document.getElementById('wish-button').style.display = 'none';
-      document.getElementById('game-grid').innerHTML = '';
-      setupGame();
-      showSection('riddles');
-      // console.log('Game replayed');
-    }
-
-    setupGame();
-  </script>
 </body>
 </html>
